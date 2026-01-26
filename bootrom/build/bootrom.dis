@@ -1,0 +1,305 @@
+
+build/bootrom.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .text:
+
+00000000 <main>:
+   0:	00003137          	lui	sp,0x3
+   4:	00004437          	lui	s0,0x4
+   8:	200004b7          	lui	s1,0x20000
+   c:	20020937          	lui	s2,0x20020
+  10:	05000fb7          	lui	t6,0x5000
+  14:	00000293          	li	t0,0
+  18:	005fa223          	sw	t0,4(t6) # 5000004 <BRAM_BASE+0x4ffc004>
+  1c:	1e600293          	li	t0,486
+  20:	0654a023          	sw	t0,96(s1) # 20000060 <SPI_BASE+0x60>
+  24:	13c00293          	li	t0,316
+  28:	0654a023          	sw	t0,96(s1)
+  2c:	08600293          	li	t0,134
+  30:	0654a023          	sw	t0,96(s1)
+  34:	00a00293          	li	t0,10
+  38:	00542023          	sw	t0,0(s0) # 4000 <BRAM_BASE>
+  3c:	01400293          	li	t0,20
+  40:	00542223          	sw	t0,4(s0)
+  44:	00042303          	lw	t1,0(s0)
+  48:	00692223          	sw	t1,4(s2) # 20020004 <UART_BASE+0x4>
+  4c:	00500293          	li	t0,5
+
+00000050 <delay1>:
+  50:	fff28293          	addi	t0,t0,-1
+  54:	fe029ee3          	bnez	t0,50 <delay1>
+  58:	00442303          	lw	t1,4(s0)
+  5c:	00692223          	sw	t1,4(s2)
+  60:	00500293          	li	t0,5
+
+00000064 <delay2>:
+  64:	fff28293          	addi	t0,t0,-1
+  68:	fe029ee3          	bnez	t0,64 <delay2>
+  6c:	00100293          	li	t0,1
+  70:	005fa023          	sw	t0,0(t6)
+  74:	ffe00293          	li	t0,-2
+  78:	0654a823          	sw	t0,112(s1)
+
+0000007c <wren_tx_wait>:
+  7c:	06c4a283          	lw	t0,108(s1)
+  80:	0644a283          	lw	t0,100(s1)
+  84:	0042f293          	andi	t0,t0,4
+  88:	fe028ae3          	beqz	t0,7c <wren_tx_wait>
+  8c:	00600293          	li	t0,6
+  90:	0654a423          	sw	t0,104(s1)
+
+00000094 <wren_end_wait>:
+  94:	0644a283          	lw	t0,100(s1)
+  98:	0042f293          	andi	t0,t0,4
+  9c:	fe028ce3          	beqz	t0,94 <wren_end_wait>
+  a0:	fff00293          	li	t0,-1
+  a4:	0654a823          	sw	t0,112(s1)
+  a8:	ffe00293          	li	t0,-2
+  ac:	0654a823          	sw	t0,112(s1)
+
+000000b0 <wrr_tx_wait_1>:
+  b0:	0644a283          	lw	t0,100(s1)
+  b4:	0042f293          	andi	t0,t0,4
+  b8:	fe028ce3          	beqz	t0,b0 <wrr_tx_wait_1>
+  bc:	00100293          	li	t0,1
+  c0:	0654a423          	sw	t0,104(s1)
+
+000000c4 <wrr_tx_wait_2>:
+  c4:	0644a283          	lw	t0,100(s1)
+  c8:	0042f293          	andi	t0,t0,4
+  cc:	fe028ce3          	beqz	t0,c4 <wrr_tx_wait_2>
+  d0:	0604a423          	sw	zero,104(s1)
+
+000000d4 <wrr_tx_wait_3>:
+  d4:	0644a283          	lw	t0,100(s1)
+  d8:	0042f293          	andi	t0,t0,4
+  dc:	fe028ce3          	beqz	t0,d4 <wrr_tx_wait_3>
+  e0:	0c200293          	li	t0,194
+  e4:	0654a423          	sw	t0,104(s1)
+
+000000e8 <wrr_end_wait>:
+  e8:	0644a283          	lw	t0,100(s1)
+  ec:	0042f293          	andi	t0,t0,4
+  f0:	fe028ce3          	beqz	t0,e8 <wrr_end_wait>
+  f4:	fff00293          	li	t0,-1
+  f8:	0654a823          	sw	t0,112(s1)
+  fc:	00300293          	li	t0,3
+ 100:	005fa023          	sw	t0,0(t6)
+
+00000104 <wip_poll_loop>:
+ 104:	0c600293          	li	t0,198
+ 108:	0654a023          	sw	t0,96(s1)
+ 10c:	ffe00293          	li	t0,-2
+ 110:	0654a823          	sw	t0,112(s1)
+
+00000114 <wip_tx_wait_1>:
+ 114:	0644a283          	lw	t0,100(s1)
+ 118:	0042f293          	andi	t0,t0,4
+ 11c:	fe028ce3          	beqz	t0,114 <wip_tx_wait_1>
+ 120:	00500293          	li	t0,5
+ 124:	0654a423          	sw	t0,104(s1)
+
+00000128 <wrr_end_wait_rdsr>:
+ 128:	0644a283          	lw	t0,100(s1)
+ 12c:	0042f293          	andi	t0,t0,4
+ 130:	fe028ce3          	beqz	t0,128 <wrr_end_wait_rdsr>
+ 134:	0604a423          	sw	zero,104(s1)
+
+00000138 <wrr_end_wait_dummy>:
+ 138:	0644a283          	lw	t0,100(s1)
+ 13c:	0042f293          	andi	t0,t0,4
+ 140:	fe028ce3          	beqz	t0,138 <wrr_end_wait_dummy>
+ 144:	fff00293          	li	t0,-1
+ 148:	0654a823          	sw	t0,112(s1)
+ 14c:	18600293          	li	t0,390
+ 150:	0654a023          	sw	t0,96(s1)
+ 154:	06c4a303          	lw	t1,108(s1)
+ 158:	06c4a303          	lw	t1,108(s1)
+ 15c:	00137313          	andi	t1,t1,1
+ 160:	fa0312e3          	bnez	t1,104 <wip_poll_loop>
+
+00000164 <uart_tx_full>:
+ 164:	00892383          	lw	t2,8(s2)
+ 168:	0043f393          	andi	t2,t2,4
+ 16c:	fe038ce3          	beqz	t2,164 <uart_tx_full>
+ 170:	00092223          	sw	zero,4(s2)
+ 174:	00092223          	sw	zero,4(s2)
+ 178:	00200293          	li	t0,2
+ 17c:	005fa023          	sw	t0,0(t6)
+ 180:	00300993          	li	s3,3
+ 184:	01392623          	sw	s3,12(s2)
+ 188:	00000993          	li	s3,0
+ 18c:	00400a13          	li	s4,4
+ 190:	00040a93          	mv	s5,s0
+ 194:	00000b13          	li	s6,0
+
+00000198 <qio_read_start>:
+ 198:	1d4000ef          	jal	36c <drain_rx_fifo>
+ 19c:	1e600293          	li	t0,486
+ 1a0:	0654a023          	sw	t0,96(s1)
+
+000001a4 <qio_tx_wait_1>:
+ 1a4:	0644a283          	lw	t0,100(s1)
+ 1a8:	0042f293          	andi	t0,t0,4
+ 1ac:	fe028ce3          	beqz	t0,1a4 <qio_tx_wait_1>
+ 1b0:	06b00293          	li	t0,107
+ 1b4:	0654a423          	sw	t0,104(s1)
+
+000001b8 <qio_tx_addr_1>:
+ 1b8:	0644a283          	lw	t0,100(s1)
+ 1bc:	0082f293          	andi	t0,t0,8
+ 1c0:	fe029ce3          	bnez	t0,1b8 <qio_tx_addr_1>
+ 1c4:	0109d293          	srli	t0,s3,0x10
+ 1c8:	0654a423          	sw	t0,104(s1)
+
+000001cc <qio_tx_addr_2>:
+ 1cc:	0644a283          	lw	t0,100(s1)
+ 1d0:	0082f293          	andi	t0,t0,8
+ 1d4:	fe029ce3          	bnez	t0,1cc <qio_tx_addr_2>
+ 1d8:	0089d293          	srli	t0,s3,0x8
+ 1dc:	0654a423          	sw	t0,104(s1)
+
+000001e0 <qio_tx_addr_3>:
+ 1e0:	0644a283          	lw	t0,100(s1)
+ 1e4:	0082f293          	andi	t0,t0,8
+ 1e8:	fe029ce3          	bnez	t0,1e0 <qio_tx_addr_3>
+ 1ec:	0734a423          	sw	s3,104(s1)
+
+000001f0 <qio_tx_dummy>:
+ 1f0:	0644a283          	lw	t0,100(s1)
+ 1f4:	0082f293          	andi	t0,t0,8
+ 1f8:	fe029ce3          	bnez	t0,1f0 <qio_tx_dummy>
+ 1fc:	0604a423          	sw	zero,104(s1)
+
+00000200 <qio_tx_dummy_wait>:
+ 200:	0644a283          	lw	t0,100(s1)
+ 204:	0082f293          	andi	t0,t0,8
+ 208:	fe029ce3          	bnez	t0,200 <qio_tx_dummy_wait>
+ 20c:	0604a423          	sw	zero,104(s1)
+
+00000210 <qio_tx_dummy_wait3>:
+ 210:	0644a283          	lw	t0,100(s1)
+ 214:	0082f293          	andi	t0,t0,8
+ 218:	fe029ce3          	bnez	t0,210 <qio_tx_dummy_wait3>
+ 21c:	0604a423          	sw	zero,104(s1)
+
+00000220 <qio_tx_dummy_wait4>:
+ 220:	0644a283          	lw	t0,100(s1)
+ 224:	0082f293          	andi	t0,t0,8
+ 228:	fe029ce3          	bnez	t0,220 <qio_tx_dummy_wait4>
+ 22c:	0604a423          	sw	zero,104(s1)
+ 230:	ffe00293          	li	t0,-2
+ 234:	0654a823          	sw	t0,112(s1)
+ 238:	08600293          	li	t0,134
+ 23c:	0654a023          	sw	t0,96(s1)
+
+00000240 <wait_tx_empty>:
+ 240:	0644a283          	lw	t0,100(s1)
+ 244:	0042f293          	andi	t0,t0,4
+ 248:	fe028ce3          	beqz	t0,240 <wait_tx_empty>
+ 24c:	06c4a303          	lw	t1,108(s1)
+ 250:	06c4a303          	lw	t1,108(s1)
+ 254:	06c4a303          	lw	t1,108(s1)
+ 258:	06c4a303          	lw	t1,108(s1)
+ 25c:	00000693          	li	a3,0
+ 260:	06c4a303          	lw	t1,108(s1)
+ 264:	00031693          	slli	a3,t1,0x0
+ 268:	06c4a303          	lw	t1,108(s1)
+ 26c:	00831313          	slli	t1,t1,0x8
+ 270:	006686b3          	add	a3,a3,t1
+ 274:	06c4a303          	lw	t1,108(s1)
+ 278:	01031313          	slli	t1,t1,0x10
+ 27c:	006686b3          	add	a3,a3,t1
+ 280:	06c4a303          	lw	t1,108(s1)
+ 284:	01831313          	slli	t1,t1,0x18
+ 288:	006686b3          	add	a3,a3,t1
+ 28c:	00daa023          	sw	a3,0(s5)
+ 290:	004a8a93          	addi	s5,s5,4
+ 294:	fffa0a13          	addi	s4,s4,-1
+
+00000298 <read_burst_loop>:
+ 298:	00400393          	li	t2,4
+ 29c:	060a0a63          	beqz	s4,310 <read_burst_end>
+
+000002a0 <tx_dummy_for_read>:
+ 2a0:	0644a283          	lw	t0,100(s1)
+ 2a4:	0042f293          	andi	t0,t0,4
+ 2a8:	fe028ce3          	beqz	t0,2a0 <tx_dummy_for_read>
+ 2ac:	0604a423          	sw	zero,104(s1)
+ 2b0:	fff38393          	addi	t2,t2,-1
+ 2b4:	fe0396e3          	bnez	t2,2a0 <tx_dummy_for_read>
+
+000002b8 <qio_rx_wait>:
+ 2b8:	0644a283          	lw	t0,100(s1)
+ 2bc:	0042f293          	andi	t0,t0,4
+ 2c0:	fe028ce3          	beqz	t0,2b8 <qio_rx_wait>
+
+000002c4 <qio_rx_wait_>:
+ 2c4:	0644a283          	lw	t0,100(s1)
+ 2c8:	0012f293          	andi	t0,t0,1
+ 2cc:	fe029ce3          	bnez	t0,2c4 <qio_rx_wait_>
+ 2d0:	00000693          	li	a3,0
+ 2d4:	06c4a303          	lw	t1,108(s1)
+ 2d8:	00031693          	slli	a3,t1,0x0
+ 2dc:	06c4a303          	lw	t1,108(s1)
+ 2e0:	00831313          	slli	t1,t1,0x8
+ 2e4:	006686b3          	add	a3,a3,t1
+ 2e8:	06c4a303          	lw	t1,108(s1)
+ 2ec:	01031313          	slli	t1,t1,0x10
+ 2f0:	006686b3          	add	a3,a3,t1
+ 2f4:	06c4a303          	lw	t1,108(s1)
+ 2f8:	01831313          	slli	t1,t1,0x18
+ 2fc:	006686b3          	add	a3,a3,t1
+ 300:	00daa023          	sw	a3,0(s5)
+ 304:	004a8a93          	addi	s5,s5,4
+ 308:	fffa0a13          	addi	s4,s4,-1
+ 30c:	f8dff06f          	j	298 <read_burst_loop>
+
+00000310 <read_burst_end>:
+ 310:	fff00293          	li	t0,-1
+ 314:	0654a823          	sw	t0,112(s1)
+ 318:	054000ef          	jal	36c <drain_rx_fifo>
+ 31c:	000b0463          	beqz	s6,324 <parse_header>
+ 320:	0380006f          	j	358 <firmware_done>
+
+00000324 <parse_header>:
+ 324:	00042283          	lw	t0,0(s0)
+ 328:	b007b337          	lui	t1,0xb007b
+ 32c:	00730313          	addi	t1,t1,7 # b007b007 <FW_MAGIC_WORD>
+ 330:	02629c63          	bne	t0,t1,368 <done>
+ 334:	00442383          	lw	t2,4(s0)
+ 338:	00842e03          	lw	t3,8(s0)
+ 33c:	00c42e83          	lw	t4,12(s0)
+ 340:	0023d393          	srli	t2,t2,0x2
+ 344:	00038a13          	mv	s4,t2
+ 348:	000e0a93          	mv	s5,t3
+ 34c:	01098993          	addi	s3,s3,16
+ 350:	00100b13          	li	s6,1
+ 354:	e45ff06f          	j	198 <qio_read_start>
+
+00000358 <firmware_done>:
+ 358:	00400293          	li	t0,4
+ 35c:	005fa023          	sw	t0,0(t6)
+ 360:	000042b7          	lui	t0,0x4
+ 364:	00028067          	jr	t0 # 4000 <BRAM_BASE>
+
+00000368 <done>:
+ 368:	0000006f          	j	368 <done>
+
+0000036c <drain_rx_fifo>:
+ 36c:	0644a283          	lw	t0,100(s1)
+ 370:	0012f293          	andi	t0,t0,1
+ 374:	00029663          	bnez	t0,380 <drain_rx_done>
+ 378:	06c4a303          	lw	t1,108(s1)
+ 37c:	ff1ff06f          	j	36c <drain_rx_fifo>
+
+00000380 <drain_rx_done>:
+ 380:	00008067          	ret
+
+00000384 <_start>:
+ 384:	00008137          	lui	sp,0x8
+ 388:	c79ff0ef          	jal	0 <main>
+
+0000038c <hang>:
+ 38c:	0000006f          	j	38c <hang>

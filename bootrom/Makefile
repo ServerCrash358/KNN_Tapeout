@@ -9,16 +9,15 @@ SRC_DIR     := src
 BUILD_DIR   := build
 SCRIPT_DIR  := ../scripts
 
-CFLAGS  := -Iinclude $(OPT_LEVEL) -march=$(ARCH) -mabi=$(ABI) $(EXTRA_CFLAGS)
-LDFLAGS := -T$(BUILD_DIR)/firmware.lds -nostdlib -lgcc
+CFLAGS  := $(OPT_LEVEL) -march=$(ARCH) -mabi=$(ABI) $(EXTRA_CFLAGS)
+LDFLAGS := -T$(BUILD_DIR)/bootrom.lds -nostdlib -lgcc
 
 # Linker script preprocessor flags
-LD_DEFINES := -DRAM_START_ADDR=$(RAM_START_ADDR) \
-              -DRAM_SIZE=$(RAM_SIZE)
+LD_DEFINES := -DBOOTROM_START_ADDR=$(BOOTROM_START_ADDR) \
+              -DBOOTROM_SIZE=$(BOOTROM_SIZE)
 
 
-
-TARGET_NAME := firmware
+TARGET_NAME := bootrom
 TARGET      := $(BUILD_DIR)/$(TARGET_NAME)
 
 C_SRCS   := $(wildcard $(SRC_DIR)/*.c)
@@ -29,8 +28,7 @@ OBJS := \
 	$(patsubst $(SRC_DIR)/%.S,$(BUILD_DIR)/%.o,$(ASM_SRCS))
 
 # Default target
-all: $(TARGET).elf $(TARGET).dis $(TARGET).bin $(TARGET).hex $(TARGET).coe $(TARGET).mem \
-     $(TARGET)_with_header.bin $(TARGET)_with_header.hex $(TARGET)_with_header.coe $(TARGET)_with_header.mem
+all: $(TARGET).elf $(TARGET).dis $(TARGET).bin $(TARGET).hex $(TARGET).coe $(TARGET).mem $(TARGET).v
 
 # Ensure build folder exists
 $(BUILD_DIR):
@@ -43,10 +41,10 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.S ../config.mk | $(BUILD_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 # Preprocess linker script
-$(BUILD_DIR)/firmware.lds: firmware.lds ../config.mk | $(BUILD_DIR)
+$(BUILD_DIR)/bootrom.lds: bootrom.lds ../config.mk | $(BUILD_DIR)
 	$(CC) -E -P -x c $(LD_DEFINES) $< -o $@
 
-$(TARGET).elf: $(OBJS) $(BUILD_DIR)/firmware.lds
+$(TARGET).elf: $(OBJS) $(BUILD_DIR)/bootrom.lds
 	$(CC) $(CFLAGS) -o $@ $(OBJS) $(LDFLAGS)
 
 # Output binaries
@@ -63,20 +61,10 @@ $(TARGET).elf: $(OBJS) $(BUILD_DIR)/firmware.lds
 	python3 $(SCRIPT_DIR)/bin2coe.py $< $@
 
 %.mem: %.bin $(SCRIPT_DIR)/bin2mem.py
-	python3 $(SCRIPT_DIR)/bin2mem.py $< $@ $(RAM_START_ADDR)
+	python3 $(SCRIPT_DIR)/bin2mem.py $< $@ $(BOOTROM_START_ADDR)
 
-# Firmware with header
-$(TARGET)_with_header.bin: $(TARGET).bin $(SCRIPT_DIR)/append_firmware_header.py
-	python3 $(SCRIPT_DIR)/append_firmware_header.py $< $@ $(FW_MAGIC) $(FW_LOAD_ADDR) $(FW_ENTRY_PC)
-
-$(TARGET)_with_header.hex: $(TARGET)_with_header.bin $(SCRIPT_DIR)/makehex.py
-	python3 $(SCRIPT_DIR)/makehex.py $< > $@
-
-$(TARGET)_with_header.coe: $(TARGET)_with_header.bin $(SCRIPT_DIR)/bin2coe.py
-	python3 $(SCRIPT_DIR)/bin2coe.py $< $@
-
-$(TARGET)_with_header.mem: $(TARGET)_with_header.bin $(SCRIPT_DIR)/bin2mem.py
-	python3 $(SCRIPT_DIR)/bin2mem.py $< $@ $(RAM_START_ADDR)
+%.v: %.bin $(SCRIPT_DIR)/bin2verilog.py
+	python3 $(SCRIPT_DIR)/bin2verilog.py $< $@ bootrom_mem
 
 clean:
 	rm -rf $(BUILD_DIR)
