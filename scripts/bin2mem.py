@@ -20,7 +20,7 @@ def bin2mem(input_file, output_file, base_address=0x00000000):
     
     with open(output_file, "w") as f:
         # Write address header
-        f.write(f"@{base_address:08X}\n")
+        f.write(f"@{base_address:06X}\n")
         
         # Write data bytes in hex format (one byte per line)
         for byte in bindata:

@@ -76,7 +76,7 @@ $(TARGET)_with_header.coe: $(TARGET)_with_header.bin $(SCRIPT_DIR)/bin2coe.py
 	python3 $(SCRIPT_DIR)/bin2coe.py $< $@
 
 $(TARGET)_with_header.mem: $(TARGET)_with_header.bin $(SCRIPT_DIR)/bin2mem.py
-	python3 $(SCRIPT_DIR)/bin2mem.py $< $@ $(RAM_START_ADDR)
+	python3 $(SCRIPT_DIR)/bin2mem.py $< $@
 
 clean:
 	rm -rf $(BUILD_DIR)

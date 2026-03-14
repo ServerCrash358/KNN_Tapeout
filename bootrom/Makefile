@@ -27,6 +27,22 @@ OBJS := \
 	$(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(C_SRCS)) \
 	$(patsubst $(SRC_DIR)/%.S,$(BUILD_DIR)/%.o,$(ASM_SRCS))
 
+TEST_DIR   := tests
+TEST_SRCS := $(wildcard $(TEST_DIR)/*.S)
+TEST_COE_TARGETS = $(patsubst $(TEST_DIR)/%.S,$(BUILD_DIR)/%_test.coe,$(TEST_SRCS))
+TEST_BIN_TARGETS = $(patsubst $(TEST_DIR)/%.S,$(BUILD_DIR)/%_test.bin,$(TEST_SRCS))
+
+tests: $(TEST_COE_TARGETS) $(TEST_BIN_TARGETS)
+
+$(BUILD_DIR)/%_test.bin: $(TEST_DIR)/%.S $(BUILD_DIR)/bootrom.lds
+	$(CC) $(CFLAGS) -o $@ $< $(LDFLAGS)
+
+$(BUILD_DIR)/%_test.coe: $(BUILD_DIR)/%_test.bin $(SCRIPT_DIR)/bin2coe.py
+	python3 $(SCRIPT_DIR)/bin2coe.py $< $@
+
+clean-tests:
+	rm -f $(TEST_COE_TARGETS) $(TEST_BIN_TARGETS)
+	
 # Default target
 all: $(TARGET).elf $(TARGET).dis $(TARGET).bin $(TARGET).hex $(TARGET).coe $(TARGET).mem $(TARGET).v
 

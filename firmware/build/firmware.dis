@@ -4,315 +4,328 @@ build/firmware.elf:     file format elf32-littleriscv
 
 Disassembly of section .text:
 
-00004000 <main>:
-    4000:	040002b7          	lui	t0,0x4000
-    4004:	00100f93          	li	t6,1
-    4008:	01f2a023          	sw	t6,0(t0) # 4000000 <_bss_end+0x3ff940c>
-    400c:	08200193          	li	gp,130
-    4010:	00500213          	li	tp,5
-    4014:	01400293          	li	t0,20
-    4018:	00000313          	li	t1,0
+00004000 <_start>:
+    4000:	00008137          	lui	sp,0x8
+    4004:	05000fb7          	lui	t6,0x5000
+    4008:	00000293          	li	t0,0
+    400c:	005fa223          	sw	t0,4(t6) # 5000004 <_bss_end+0x4ff971c>
+    4010:	008000ef          	jal	4018 <main>
 
-0000401c <test_loop>:
-    401c:	32535e63          	bge	t1,t0,4358 <end>
-    4020:	00000397          	auipc	t2,0x0
-    4024:	35c38393          	addi	t2,t2,860 # 437c <_etext>
-    4028:	00002417          	auipc	s0,0x2
-    402c:	5dc40413          	addi	s0,s0,1500 # 6604 <test_data>
-    4030:	04400493          	li	s1,68
-    4034:	02930533          	mul	a0,t1,s1
-    4038:	00a40433          	add	s0,s0,a0
-    403c:	00003597          	auipc	a1,0x3
-    4040:	b1858593          	addi	a1,a1,-1256 # 6b54 <dist_label_pairs>
-    4044:	00003617          	auipc	a2,0x3
-    4048:	b3860613          	addi	a2,a2,-1224 # 6b7c <label_counts>
-    404c:	00000693          	li	a3,0
-    4050:	00000713          	li	a4,0
+00004014 <hang>:
+    4014:	0000006f          	j	4014 <hang>
 
-00004054 <clear_dlp>:
-    4054:	00475e63          	bge	a4,tp,4070 <after_clear>
-    4058:	00371793          	slli	a5,a4,0x3
-    405c:	00f58833          	add	a6,a1,a5
-    4060:	00082023          	sw	zero,0(a6)
-    4064:	00082223          	sw	zero,4(a6)
-    4068:	00170713          	addi	a4,a4,1
-    406c:	fe9ff06f          	j	4054 <clear_dlp>
+00004018 <main>:
+    4018:	050002b7          	lui	t0,0x5000
+    401c:	00100f93          	li	t6,1
+    4020:	01f2a023          	sw	t6,0(t0) # 5000000 <_bss_end+0x4ff9718>
+    4024:	08200193          	li	gp,130
+    4028:	00500213          	li	tp,5
+    402c:	00700293          	li	t0,7
+    4030:	00000313          	li	t1,0
 
-00004070 <after_clear>:
-    4070:	fff00893          	li	a7,-1
-    4074:	fff00913          	li	s2,-1
+00004034 <test_loop>:
+    4034:	34535c63          	bge	t1,t0,438c <end>
+    4038:	00000397          	auipc	t2,0x0
+    403c:	36838393          	addi	t2,t2,872 # 43a0 <_etext>
+    4040:	00002417          	auipc	s0,0x2
+    4044:	5e840413          	addi	s0,s0,1512 # 6628 <test_data>
+    4048:	04400493          	li	s1,68
+    404c:	02930533          	mul	a0,t1,s1
+    4050:	00a40433          	add	s0,s0,a0
+    4054:	00002597          	auipc	a1,0x2
+    4058:	7f458593          	addi	a1,a1,2036 # 6848 <dist_label_pairs>
+    405c:	00003617          	auipc	a2,0x3
+    4060:	81460613          	addi	a2,a2,-2028 # 6870 <label_counts>
+    4064:	00000693          	li	a3,0
+    4068:	00000713          	li	a4,0
 
-00004078 <train_loop>:
-    4078:	0c36da63          	bge	a3,gp,414c <after_train>
-    407c:	0003a983          	lw	s3,0(t2)
-    4080:	00438a13          	addi	s4,t2,4
-    4084:	00440a93          	addi	s5,s0,4
-    4088:	00000b13          	li	s6,0
-    408c:	00000b93          	li	s7,0
+0000406c <clear_dlp>:
+    406c:	00475e63          	bge	a4,tp,4088 <after_clear>
+    4070:	00371793          	slli	a5,a4,0x3
+    4074:	00f58833          	add	a6,a1,a5
+    4078:	00082023          	sw	zero,0(a6)
+    407c:	00082223          	sw	zero,4(a6)
+    4080:	00170713          	addi	a4,a4,1
+    4084:	fe9ff06f          	j	406c <clear_dlp>
 
-00004090 <pix_loop>:
-    4090:	04000c13          	li	s8,64
-    4094:	038bd263          	bge	s7,s8,40b8 <insert_k>
-    4098:	000a2c83          	lw	s9,0(s4)
-    409c:	000aad03          	lw	s10,0(s5)
-    40a0:	7facfdb3          	.word	0x7facfdb3
-    40a4:	01bb0b33          	add	s6,s6,s11
-    40a8:	004a0a13          	addi	s4,s4,4
-    40ac:	004a8a93          	addi	s5,s5,4
-    40b0:	004b8b93          	addi	s7,s7,4
-    40b4:	fddff06f          	j	4090 <pix_loop>
+00004088 <after_clear>:
+    4088:	fff00893          	li	a7,-1
+    408c:	fff00913          	li	s2,-1
 
-000040b8 <insert_k>:
-    40b8:	0446ca63          	blt	a3,tp,410c <store_new>
-    40bc:	00391e13          	slli	t3,s2,0x3
-    40c0:	01c58eb3          	add	t4,a1,t3
-    40c4:	000eaf03          	lw	t5,0(t4)
-    40c8:	07eb5c63          	bge	s6,t5,4140 <next_train>
-    40cc:	016ea023          	sw	s6,0(t4)
-    40d0:	013ea223          	sw	s3,4(t4)
-    40d4:	fff00893          	li	a7,-1
-    40d8:	fff00913          	li	s2,-1
-    40dc:	00000f93          	li	t6,0
+00004090 <train_loop>:
+    4090:	0c36da63          	bge	a3,gp,4164 <after_train>
+    4094:	0003a983          	lw	s3,0(t2)
+    4098:	00438a13          	addi	s4,t2,4
+    409c:	00440a93          	addi	s5,s0,4
+    40a0:	00000b13          	li	s6,0
+    40a4:	00000b93          	li	s7,0
 
-000040e0 <find_max>:
-    40e0:	064fd063          	bge	t6,tp,4140 <next_train>
-    40e4:	003f9e13          	slli	t3,t6,0x3
-    40e8:	01c58eb3          	add	t4,a1,t3
-    40ec:	000eaf03          	lw	t5,0(t4)
-    40f0:	01e8c663          	blt	a7,t5,40fc <set_max>
-    40f4:	001f8f93          	addi	t6,t6,1
-    40f8:	fe9ff06f          	j	40e0 <find_max>
+000040a8 <pix_loop>:
+    40a8:	04000c13          	li	s8,64
+    40ac:	038bd263          	bge	s7,s8,40d0 <insert_k>
+    40b0:	000a2c83          	lw	s9,0(s4)
+    40b4:	000aad03          	lw	s10,0(s5)
+    40b8:	7facfdb3          	.word	0x7facfdb3
+    40bc:	01bb0b33          	add	s6,s6,s11
+    40c0:	004a0a13          	addi	s4,s4,4
+    40c4:	004a8a93          	addi	s5,s5,4
+    40c8:	004b8b93          	addi	s7,s7,4
+    40cc:	fddff06f          	j	40a8 <pix_loop>
 
-000040fc <set_max>:
-    40fc:	000f0893          	mv	a7,t5
-    4100:	000f8913          	mv	s2,t6
-    4104:	001f8f93          	addi	t6,t6,1
-    4108:	fd9ff06f          	j	40e0 <find_max>
+000040d0 <insert_k>:
+    40d0:	0446ca63          	blt	a3,tp,4124 <store_new>
+    40d4:	00391e13          	slli	t3,s2,0x3
+    40d8:	01c58eb3          	add	t4,a1,t3
+    40dc:	000eaf03          	lw	t5,0(t4)
+    40e0:	07eb5c63          	bge	s6,t5,4158 <next_train>
+    40e4:	016ea023          	sw	s6,0(t4)
+    40e8:	013ea223          	sw	s3,4(t4)
+    40ec:	fff00893          	li	a7,-1
+    40f0:	fff00913          	li	s2,-1
+    40f4:	00000f93          	li	t6,0
 
-0000410c <store_new>:
-    410c:	00369e13          	slli	t3,a3,0x3
-    4110:	01c58eb3          	add	t4,a1,t3
-    4114:	016ea023          	sw	s6,0(t4)
-    4118:	013ea223          	sw	s3,4(t4)
-    411c:	00068863          	beqz	a3,412c <set_first>
-    4120:	000eaf03          	lw	t5,0(t4)
-    4124:	01e8ca63          	blt	a7,t5,4138 <update_max>
-    4128:	0180006f          	j	4140 <next_train>
+000040f8 <find_max>:
+    40f8:	064fd063          	bge	t6,tp,4158 <next_train>
+    40fc:	003f9e13          	slli	t3,t6,0x3
+    4100:	01c58eb3          	add	t4,a1,t3
+    4104:	000eaf03          	lw	t5,0(t4)
+    4108:	01e8c663          	blt	a7,t5,4114 <set_max>
+    410c:	001f8f93          	addi	t6,t6,1
+    4110:	fe9ff06f          	j	40f8 <find_max>
 
-0000412c <set_first>:
-    412c:	000b0893          	mv	a7,s6
-    4130:	00068913          	mv	s2,a3
-    4134:	00c0006f          	j	4140 <next_train>
+00004114 <set_max>:
+    4114:	000f0893          	mv	a7,t5
+    4118:	000f8913          	mv	s2,t6
+    411c:	001f8f93          	addi	t6,t6,1
+    4120:	fd9ff06f          	j	40f8 <find_max>
 
-00004138 <update_max>:
-    4138:	000b0893          	mv	a7,s6
-    413c:	00068913          	mv	s2,a3
+00004124 <store_new>:
+    4124:	00369e13          	slli	t3,a3,0x3
+    4128:	01c58eb3          	add	t4,a1,t3
+    412c:	016ea023          	sw	s6,0(t4)
+    4130:	013ea223          	sw	s3,4(t4)
+    4134:	00068863          	beqz	a3,4144 <set_first>
+    4138:	000eaf03          	lw	t5,0(t4)
+    413c:	01e8ca63          	blt	a7,t5,4150 <update_max>
+    4140:	0180006f          	j	4158 <next_train>
 
-00004140 <next_train>:
-    4140:	04438393          	addi	t2,t2,68
-    4144:	00168693          	addi	a3,a3,1
-    4148:	f31ff06f          	j	4078 <train_loop>
+00004144 <set_first>:
+    4144:	000b0893          	mv	a7,s6
+    4148:	00068913          	mv	s2,a3
+    414c:	00c0006f          	j	4158 <next_train>
 
-0000414c <after_train>:
-    414c:	00000693          	li	a3,0
+00004150 <update_max>:
+    4150:	000b0893          	mv	a7,s6
+    4154:	00068913          	mv	s2,a3
 
-00004150 <clear_labels>:
-    4150:	00a00713          	li	a4,10
-    4154:	00e6dc63          	bge	a3,a4,416c <vote_loop>
-    4158:	00269793          	slli	a5,a3,0x2
-    415c:	00f60833          	add	a6,a2,a5
-    4160:	00082023          	sw	zero,0(a6)
-    4164:	00168693          	addi	a3,a3,1
-    4168:	fe9ff06f          	j	4150 <clear_labels>
+00004158 <next_train>:
+    4158:	04438393          	addi	t2,t2,68
+    415c:	00168693          	addi	a3,a3,1
+    4160:	f31ff06f          	j	4090 <train_loop>
 
-0000416c <vote_loop>:
-    416c:	00000693          	li	a3,0
-    4170:	00000713          	li	a4,0
-    4174:	fff00793          	li	a5,-1
+00004164 <after_train>:
+    4164:	00000693          	li	a3,0
 
-00004178 <vote_count>:
-    4178:	0246de63          	bge	a3,tp,41b4 <check_all_one>
-    417c:	00369813          	slli	a6,a3,0x3
-    4180:	010588b3          	add	a7,a1,a6
-    4184:	0048a903          	lw	s2,4(a7)
-    4188:	00291993          	slli	s3,s2,0x2
-    418c:	013609b3          	add	s3,a2,s3
-    4190:	0009aa03          	lw	s4,0(s3)
-    4194:	001a0a13          	addi	s4,s4,1
-    4198:	0149a023          	sw	s4,0(s3)
-    419c:	01474463          	blt	a4,s4,41a4 <set_pred>
-    41a0:	00c0006f          	j	41ac <next_vote>
+00004168 <clear_labels>:
+    4168:	00a00713          	li	a4,10
+    416c:	00e6dc63          	bge	a3,a4,4184 <vote_loop>
+    4170:	00269793          	slli	a5,a3,0x2
+    4174:	00f60833          	add	a6,a2,a5
+    4178:	00082023          	sw	zero,0(a6)
+    417c:	00168693          	addi	a3,a3,1
+    4180:	fe9ff06f          	j	4168 <clear_labels>
 
-000041a4 <set_pred>:
-    41a4:	000a0713          	mv	a4,s4
-    41a8:	00090793          	mv	a5,s2
+00004184 <vote_loop>:
+    4184:	00000693          	li	a3,0
+    4188:	00000713          	li	a4,0
+    418c:	fff00793          	li	a5,-1
 
-000041ac <next_vote>:
-    41ac:	00168693          	addi	a3,a3,1
-    41b0:	fc9ff06f          	j	4178 <vote_count>
+00004190 <vote_count>:
+    4190:	0246de63          	bge	a3,tp,41cc <check_all_one>
+    4194:	00369813          	slli	a6,a3,0x3
+    4198:	010588b3          	add	a7,a1,a6
+    419c:	0048a903          	lw	s2,4(a7)
+    41a0:	00291993          	slli	s3,s2,0x2
+    41a4:	013609b3          	add	s3,a2,s3
+    41a8:	0009aa03          	lw	s4,0(s3)
+    41ac:	001a0a13          	addi	s4,s4,1
+    41b0:	0149a023          	sw	s4,0(s3)
+    41b4:	01474463          	blt	a4,s4,41bc <set_pred>
+    41b8:	00c0006f          	j	41c4 <next_vote>
 
-000041b4 <check_all_one>:
-    41b4:	00000693          	li	a3,0
-    41b8:	00000a93          	li	s5,0
+000041bc <set_pred>:
+    41bc:	000a0713          	mv	a4,s4
+    41c0:	00090793          	mv	a5,s2
 
-000041bc <check_loop>:
-    41bc:	0246da63          	bge	a3,tp,41f0 <rule2_check_done>
-    41c0:	00369b13          	slli	s6,a3,0x3
-    41c4:	01658bb3          	add	s7,a1,s6
-    41c8:	004bac03          	lw	s8,4(s7)
-    41cc:	002c1c93          	slli	s9,s8,0x2
-    41d0:	01960cb3          	add	s9,a2,s9
-    41d4:	000cad03          	lw	s10,0(s9)
-    41d8:	00100d93          	li	s11,1
-    41dc:	01bd1863          	bne	s10,s11,41ec <not_all_ones>
-    41e0:	001a8a93          	addi	s5,s5,1
-    41e4:	00168693          	addi	a3,a3,1
-    41e8:	fd5ff06f          	j	41bc <check_loop>
+000041c4 <next_vote>:
+    41c4:	00168693          	addi	a3,a3,1
+    41c8:	fc9ff06f          	j	4190 <vote_count>
 
-000041ec <not_all_ones>:
-    41ec:	fff00a93          	li	s5,-1
+000041cc <check_all_one>:
+    41cc:	00000693          	li	a3,0
+    41d0:	00000a93          	li	s5,0
 
-000041f0 <rule2_check_done>:
-    41f0:	104a8863          	beq	s5,tp,4300 <fallback_nn>
-    41f4:	00000693          	li	a3,0
-    41f8:	00000e13          	li	t3,0
-    41fc:	fff00e93          	li	t4,-1
+000041d4 <check_loop>:
+    41d4:	0246da63          	bge	a3,tp,4208 <rule2_check_done>
+    41d8:	00369b13          	slli	s6,a3,0x3
+    41dc:	01658bb3          	add	s7,a1,s6
+    41e0:	004bac03          	lw	s8,4(s7)
+    41e4:	002c1c93          	slli	s9,s8,0x2
+    41e8:	01960cb3          	add	s9,a2,s9
+    41ec:	000cad03          	lw	s10,0(s9)
+    41f0:	00100d93          	li	s11,1
+    41f4:	01bd1863          	bne	s10,s11,4204 <not_all_ones>
+    41f8:	001a8a93          	addi	s5,s5,1
+    41fc:	00168693          	addi	a3,a3,1
+    4200:	fd5ff06f          	j	41d4 <check_loop>
 
-00004200 <tie_loop>:
-    4200:	0446d063          	bge	a3,tp,4240 <check_tie_done>
-    4204:	00369f13          	slli	t5,a3,0x3
-    4208:	01e58fb3          	add	t6,a1,t5
-    420c:	004faa03          	lw	s4,4(t6)
-    4210:	002a1a93          	slli	s5,s4,0x2
-    4214:	01560ab3          	add	s5,a2,s5
-    4218:	000aab03          	lw	s6,0(s5)
-    421c:	016e4663          	blt	t3,s6,4228 <new_max>
-    4220:	016e0a63          	beq	t3,s6,4234 <inc_max_count>
-    4224:	0140006f          	j	4238 <next_tie>
+00004204 <not_all_ones>:
+    4204:	fff00a93          	li	s5,-1
 
-00004228 <new_max>:
-    4228:	000b0e13          	mv	t3,s6
-    422c:	00100e93          	li	t4,1
-    4230:	0080006f          	j	4238 <next_tie>
+00004208 <rule2_check_done>:
+    4208:	104a8863          	beq	s5,tp,4318 <fallback_nn>
+    420c:	00000693          	li	a3,0
+    4210:	00000e13          	li	t3,0
+    4214:	fff00e93          	li	t4,-1
 
-00004234 <inc_max_count>:
-    4234:	001e8e93          	addi	t4,t4,1
+00004218 <tie_loop>:
+    4218:	0446d063          	bge	a3,tp,4258 <check_tie_done>
+    421c:	00369f13          	slli	t5,a3,0x3
+    4220:	01e58fb3          	add	t6,a1,t5
+    4224:	004faa03          	lw	s4,4(t6)
+    4228:	002a1a93          	slli	s5,s4,0x2
+    422c:	01560ab3          	add	s5,a2,s5
+    4230:	000aab03          	lw	s6,0(s5)
+    4234:	016e4663          	blt	t3,s6,4240 <new_max>
+    4238:	016e0a63          	beq	t3,s6,424c <inc_max_count>
+    423c:	0140006f          	j	4250 <next_tie>
 
-00004238 <next_tie>:
-    4238:	00168693          	addi	a3,a3,1
-    423c:	fc5ff06f          	j	4200 <tie_loop>
+00004240 <new_max>:
+    4240:	000b0e13          	mv	t3,s6
+    4244:	00100e93          	li	t4,1
+    4248:	0080006f          	j	4250 <next_tie>
 
-00004240 <check_tie_done>:
-    4240:	00100a93          	li	s5,1
-    4244:	0fdad463          	bge	s5,t4,432c <store_result>
-    4248:	00000693          	li	a3,0
+0000424c <inc_max_count>:
+    424c:	001e8e93          	addi	t4,t4,1
 
-0000424c <sort_outer>:
-    424c:	0646dc63          	bge	a3,tp,42c4 <pick_sorted_max>
-    4250:	00068713          	mv	a4,a3
-    4254:	00168793          	addi	a5,a3,1
+00004250 <next_tie>:
+    4250:	00168693          	addi	a3,a3,1
+    4254:	fc5ff06f          	j	4218 <tie_loop>
 
-00004258 <sort_inner>:
-    4258:	0247d863          	bge	a5,tp,4288 <sort_check>
-    425c:	00371813          	slli	a6,a4,0x3
-    4260:	010588b3          	add	a7,a1,a6
-    4264:	0008a903          	lw	s2,0(a7)
-    4268:	00379993          	slli	s3,a5,0x3
-    426c:	01358a33          	add	s4,a1,s3
-    4270:	000a2a83          	lw	s5,0(s4)
-    4274:	012ac463          	blt	s5,s2,427c <set_new_min>
-    4278:	0080006f          	j	4280 <skip_sort>
+00004258 <check_tie_done>:
+    4258:	00100a93          	li	s5,1
+    425c:	0fdad463          	bge	s5,t4,4344 <store_result>
+    4260:	00000693          	li	a3,0
 
-0000427c <set_new_min>:
-    427c:	00078713          	mv	a4,a5
+00004264 <sort_outer>:
+    4264:	0646dc63          	bge	a3,tp,42dc <pick_sorted_max>
+    4268:	00068713          	mv	a4,a3
+    426c:	00168793          	addi	a5,a3,1
 
-00004280 <skip_sort>:
-    4280:	00178793          	addi	a5,a5,1
-    4284:	fd5ff06f          	j	4258 <sort_inner>
+00004270 <sort_inner>:
+    4270:	0247d863          	bge	a5,tp,42a0 <sort_check>
+    4274:	00371813          	slli	a6,a4,0x3
+    4278:	010588b3          	add	a7,a1,a6
+    427c:	0008a903          	lw	s2,0(a7)
+    4280:	00379993          	slli	s3,a5,0x3
+    4284:	01358a33          	add	s4,a1,s3
+    4288:	000a2a83          	lw	s5,0(s4)
+    428c:	012ac463          	blt	s5,s2,4294 <set_new_min>
+    4290:	0080006f          	j	4298 <skip_sort>
 
-00004288 <sort_check>:
-    4288:	02e68a63          	beq	a3,a4,42bc <skip_swap>
-    428c:	00369b13          	slli	s6,a3,0x3
-    4290:	01658bb3          	add	s7,a1,s6
-    4294:	000bac03          	lw	s8,0(s7)
-    4298:	004bac83          	lw	s9,4(s7)
-    429c:	00371d13          	slli	s10,a4,0x3
-    42a0:	01a58db3          	add	s11,a1,s10
-    42a4:	000dae03          	lw	t3,0(s11)
-    42a8:	004dae83          	lw	t4,4(s11)
-    42ac:	01cba023          	sw	t3,0(s7)
-    42b0:	01dba223          	sw	t4,4(s7)
-    42b4:	018da023          	sw	s8,0(s11)
-    42b8:	019da223          	sw	s9,4(s11)
+00004294 <set_new_min>:
+    4294:	00078713          	mv	a4,a5
 
-000042bc <skip_swap>:
-    42bc:	00168693          	addi	a3,a3,1
-    42c0:	f8dff06f          	j	424c <sort_outer>
+00004298 <skip_sort>:
+    4298:	00178793          	addi	a5,a5,1
+    429c:	fd5ff06f          	j	4270 <sort_inner>
 
-000042c4 <pick_sorted_max>:
-    42c4:	00000693          	li	a3,0
-    42c8:	fff00e13          	li	t3,-1
+000042a0 <sort_check>:
+    42a0:	02e68a63          	beq	a3,a4,42d4 <skip_swap>
+    42a4:	00369b13          	slli	s6,a3,0x3
+    42a8:	01658bb3          	add	s7,a1,s6
+    42ac:	000bac03          	lw	s8,0(s7)
+    42b0:	004bac83          	lw	s9,4(s7)
+    42b4:	00371d13          	slli	s10,a4,0x3
+    42b8:	01a58db3          	add	s11,a1,s10
+    42bc:	000dae03          	lw	t3,0(s11)
+    42c0:	004dae83          	lw	t4,4(s11)
+    42c4:	01cba023          	sw	t3,0(s7)
+    42c8:	01dba223          	sw	t4,4(s7)
+    42cc:	018da023          	sw	s8,0(s11)
+    42d0:	019da223          	sw	s9,4(s11)
 
-000042cc <pick_loop>:
-    42cc:	0646d063          	bge	a3,tp,432c <store_result>
-    42d0:	00369e93          	slli	t4,a3,0x3
-    42d4:	01d58f33          	add	t5,a1,t4
-    42d8:	004f2f83          	lw	t6,4(t5)
-    42dc:	002f9a13          	slli	s4,t6,0x2
-    42e0:	01460a33          	add	s4,a2,s4
-    42e4:	000a2a83          	lw	s5,0(s4)
-    42e8:	015e4463          	blt	t3,s5,42f0 <update_final>
-    42ec:	00c0006f          	j	42f8 <next_final>
+000042d4 <skip_swap>:
+    42d4:	00168693          	addi	a3,a3,1
+    42d8:	f8dff06f          	j	4264 <sort_outer>
 
-000042f0 <update_final>:
-    42f0:	000a8e13          	mv	t3,s5
-    42f4:	000f8793          	mv	a5,t6
+000042dc <pick_sorted_max>:
+    42dc:	00000693          	li	a3,0
+    42e0:	fff00e13          	li	t3,-1
 
-000042f8 <next_final>:
-    42f8:	00168693          	addi	a3,a3,1
-    42fc:	fd1ff06f          	j	42cc <pick_loop>
+000042e4 <pick_loop>:
+    42e4:	0646d063          	bge	a3,tp,4344 <store_result>
+    42e8:	00369e93          	slli	t4,a3,0x3
+    42ec:	01d58f33          	add	t5,a1,t4
+    42f0:	004f2f83          	lw	t6,4(t5)
+    42f4:	002f9a13          	slli	s4,t6,0x2
+    42f8:	01460a33          	add	s4,a2,s4
+    42fc:	000a2a83          	lw	s5,0(s4)
+    4300:	015e4463          	blt	t3,s5,4308 <update_final>
+    4304:	00c0006f          	j	4310 <next_final>
 
-00004300 <fallback_nn>:
-    4300:	00000693          	li	a3,0
-    4304:	00000d93          	li	s11,0
+00004308 <update_final>:
+    4308:	000a8e13          	mv	t3,s5
+    430c:	000f8793          	mv	a5,t6
 
-00004308 <fallback_loop>:
-    4308:	0246d263          	bge	a3,tp,432c <store_result>
-    430c:	00369e13          	slli	t3,a3,0x3
-    4310:	01c58eb3          	add	t4,a1,t3
-    4314:	000eaf03          	lw	t5,0(t4)
-    4318:	01edc663          	blt	s11,t5,4324 <skip_fb>
-    431c:	000f0d93          	mv	s11,t5
-    4320:	004ea783          	lw	a5,4(t4)
+00004310 <next_final>:
+    4310:	00168693          	addi	a3,a3,1
+    4314:	fd1ff06f          	j	42e4 <pick_loop>
 
-00004324 <skip_fb>:
-    4324:	00168693          	addi	a3,a3,1
-    4328:	fe1ff06f          	j	4308 <fallback_loop>
+00004318 <fallback_nn>:
+    4318:	00000693          	li	a3,0
+    431c:	00000d93          	li	s11,0
 
-0000432c <store_result>:
-    432c:	00003817          	auipc	a6,0x3
-    4330:	87880813          	addi	a6,a6,-1928 # 6ba4 <Predicted_label>
-    4334:	00231893          	slli	a7,t1,0x2
-    4338:	01180833          	add	a6,a6,a7
-    433c:	00f82023          	sw	a5,0(a6)
-    4340:	03000937          	lui	s2,0x3000
-    4344:	00f92023          	sw	a5,0(s2) # 3000000 <_bss_end+0x2ff940c>
-    4348:	05000137          	lui	sp,0x5000
-    434c:	00f12023          	sw	a5,0(sp) # 5000000 <_bss_end+0x4ff940c>
-    4350:	00130313          	addi	t1,t1,1
-    4354:	cc9ff06f          	j	401c <test_loop>
+00004320 <fallback_loop>:
+    4320:	0246d263          	bge	a3,tp,4344 <store_result>
+    4324:	00369e13          	slli	t3,a3,0x3
+    4328:	01c58eb3          	add	t4,a1,t3
+    432c:	000eaf03          	lw	t5,0(t4)
+    4330:	01edc663          	blt	s11,t5,433c <skip_fb>
+    4334:	000f0d93          	mv	s11,t5
+    4338:	004ea783          	lw	a5,4(t4)
 
-00004358 <end>:
-    4358:	040002b7          	lui	t0,0x4000
-    435c:	00428293          	addi	t0,t0,4 # 4000004 <_bss_end+0x3ff9410>
-    4360:	00989fb7          	lui	t6,0x989
-    4364:	680f8f93          	addi	t6,t6,1664 # 989680 <_bss_end+0x982a8c>
-    4368:	01f2a023          	sw	t6,0(t0)
-    436c:	00000013          	nop
+0000433c <skip_fb>:
+    433c:	00168693          	addi	a3,a3,1
+    4340:	fe1ff06f          	j	4320 <fallback_loop>
 
-00004370 <_start>:
-    4370:	00008137          	lui	sp,0x8
-    4374:	c8dff0ef          	jal	4000 <main>
+00004344 <store_result>:
+    4344:	00002817          	auipc	a6,0x2
+    4348:	55480813          	addi	a6,a6,1364 # 6898 <Predicted_label>
+    434c:	00231893          	slli	a7,t1,0x2
+    4350:	01180833          	add	a6,a6,a7
+    4354:	00f82023          	sw	a5,0(a6)
+    4358:	20020937          	lui	s2,0x20020
+    435c:	00f92223          	sw	a5,4(s2) # 20020004 <_bss_end+0x2001971c>
+    4360:	05000137          	lui	sp,0x5000
+    4364:	00f12023          	sw	a5,0(sp) # 5000000 <_bss_end+0x4ff9718>
+    4368:	0007a537          	lui	a0,0x7a
+    436c:	12050513          	addi	a0,a0,288 # 7a120 <_bss_end+0x73838>
+    4370:	00c000ef          	jal	437c <delay>
+    4374:	00130313          	addi	t1,t1,1
+    4378:	cbdff06f          	j	4034 <test_loop>
 
-00004378 <hang>:
-    4378:	0000006f          	j	4378 <hang>
+0000437c <delay>:
+    437c:	00355f93          	srli	t6,a0,0x3
+
+00004380 <delay_loop>:
+    4380:	ffff8f93          	addi	t6,t6,-1
+    4384:	fe0f9ee3          	bnez	t6,4380 <delay_loop>
+    4388:	00008067          	ret
+
+0000438c <end>:
+    438c:	050002b7          	lui	t0,0x5000
+    4390:	00989fb7          	lui	t6,0x989
+    4394:	680f8f93          	addi	t6,t6,1664 # 989680 <_bss_end+0x982d98>
+    4398:	01f2a023          	sw	t6,0(t0) # 5000000 <_bss_end+0x4ff9718>
+    439c:	c79ff06f          	j	4014 <hang>

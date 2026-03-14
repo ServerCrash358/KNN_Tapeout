@@ -5,6 +5,8 @@ MEMORY {
 SECTIONS
 {
   .text : {
+    KEEP(*(.text.startup))
+    KEEP(*(.init))
     *(.text*)
     _etext = .;
   } > ram

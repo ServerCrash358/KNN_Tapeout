@@ -27,7 +27,7 @@
 .equ FW_HEADER_BYTES, 16
 
 
-.text
+.text.startup
 .global main
 
 main:
