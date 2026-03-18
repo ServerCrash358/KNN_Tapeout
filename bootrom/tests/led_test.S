@@ -1,7 +1,11 @@
 .equ GPIO_BASE, 0x05000000
 
 .text
-    la s0, GPIO_BASE
+    li s0, GPIO_BASE
+
+    # Set GPIO direction to output
+    li   t0, 0x0
+    sw   t0, 4(s0)
 
 test_loop:
     li s1, 0x1

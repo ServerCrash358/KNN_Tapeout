@@ -287,7 +287,8 @@ store_result:
     sw   x15, 0(x2)             # stores the index/ counter value of x30
 
     # delay for 0.5 seconds, assuming 100MHz clock
-    li   x10, 1000000 / 2 
+    li  x10, 100000000 / 2
+    # li   x10, 8
     call delay    
 
     addi x6, x6, 1
