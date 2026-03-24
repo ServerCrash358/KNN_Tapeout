@@ -4,7 +4,10 @@
 # Include project configuration
 include config.mk
 
-.PHONY: all bootrom firmware clean clean-bootrom clean-firmware help config
+CC      := $(if $(wildcard $(RISCV_PREFIX)-gcc),$(RISCV_PREFIX)-gcc,riscv32-unknown-elf-gcc)
+OBJDUMP := $(patsubst %gcc,%objdump,$(CC))
+
+.PHONY: all bootrom firmware uart-path clean clean-bootrom clean-firmware help config
 
 # Default target builds everything
 all: bootrom firmware
@@ -18,6 +21,26 @@ bootrom: config.mk
 firmware: config.mk
 	@echo "Building firmware..."
 	$(MAKE) -C firmware
+
+# UART path: bootrom without flash loading + firmware combined into single binary
+uart-path: config.mk
+	@echo "Building bootrom for UART path (no flash loading)..."
+	$(MAKE) -C bootrom BUILD_MODE=UART_PATH
+	@echo "Building firmware (no header)..."
+	$(MAKE) -C firmware build/firmware.elf build/firmware.dis build/firmware.bin build/firmware.hex
+	@echo "Combining bootrom and firmware into UART binary..."
+	python3 scripts/combine_binaries.py \
+		-o bootrom/build/uart_combined.bin \
+		bootrom/build/bootrom_UART_PATH.bin \
+		firmware/build/firmware.bin
+	@echo "Generating output formats for combined binary..."
+	python3 scripts/makehex.py bootrom/build/uart_combined.bin > bootrom/build/uart_combined.hex
+	python3 scripts/bin2dis.py bootrom/build/uart_combined.bin bootrom/build/uart_combined.dis $(OBJDUMP) riscv:rv32
+	@echo ""
+	@echo "UART path build complete:"
+	@echo "  Combined binary: bootrom/build/uart_combined.bin"
+	@echo "  Hex format:      bootrom/build/uart_combined.hex"
+	@echo "  Disassembly:     bootrom/build/uart_combined.dis"
 
 # Clean everything
 clean: clean-bootrom clean-firmware
@@ -40,8 +63,9 @@ help:
 	@echo ""
 	@echo "Targets:"
 	@echo "  all            - Build both bootrom and firmware (default)"
-	@echo "  bootrom        - Build only bootrom"
-	@echo "  firmware       - Build only firmware"
+	@echo "  bootrom        - Build bootrom for flash path"
+	@echo "  firmware       - Build firmware"
+	@echo "  uart-path      - Build combined UART binary (bootrom without flash + firmware)"
 	@echo "  clean          - Clean all build artifacts"
 	@echo "  clean-bootrom  - Clean bootrom build artifacts"
 	@echo "  clean-firmware - Clean firmware build artifacts"

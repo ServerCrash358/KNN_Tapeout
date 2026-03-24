@@ -16,8 +16,14 @@ LDFLAGS := -T$(BUILD_DIR)/bootrom.lds -nostdlib -lgcc
 LD_DEFINES := -DBOOTROM_START_ADDR=$(BOOTROM_START_ADDR) \
               -DBOOTROM_SIZE=$(BOOTROM_SIZE)
 
+# Build type (FLASH_PATH or UART_PATH)
+BUILD_MODE ?= FLASH_PATH
+CFLAGS += -D$(BUILD_MODE)
 
-TARGET_NAME := bootrom
+# Output suffix based on build mode (for UART_PATH, creates separate bootrom)
+OUTPUT_SUFFIX := $(if $(filter UART_PATH,$(BUILD_MODE)),_UART_PATH,)
+
+TARGET_NAME := bootrom$(OUTPUT_SUFFIX)
 TARGET      := $(BUILD_DIR)/$(TARGET_NAME)
 
 C_SRCS   := $(wildcard $(SRC_DIR)/*.c)

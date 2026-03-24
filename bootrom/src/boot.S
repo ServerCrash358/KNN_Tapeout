@@ -29,9 +29,6 @@
 # --- Firmware load parameters ---
 .equ FW_FLASH_OFFSET,   0x00000000   # flash offset where .mem starts
 .equ FW_MAGIC_WORD,     0xB007B007
-
-# IMPORTANT: must match .mem size
-# Example: if .mem is 11248 bytes total
 .equ FW_HEADER_WORDS, 4
 .equ FW_HEADER_BYTES, 16
 
@@ -53,6 +50,7 @@ main:
     li   t0, 0x0
     sw   t0, 4(t6)
 
+.ifdef FLASH_PATH
     # --- SPI Init ---
     li   t0, 0x1E6
     sw   t0, 0x60(s1)
@@ -60,6 +58,7 @@ main:
     sw   t0, 0x60(s1)
     li   t0, 0x086
     sw   t0, 0x60(s1)
+.endif
 
 ####################### --- BRAM TEST ---
     li   t0, 10
@@ -87,6 +86,7 @@ delay2:
     li   t0, 0x01
     sw   t0, 0(t6)
 
+.ifdef FLASH_PATH
 ####################### --- WREN ---
     li   t0, -2
     sw   t0, SPI_SSR_OFFSET(s1)
@@ -198,6 +198,9 @@ uart_tx_full:
     mv   s5, s0                  # store header at BRAM base
     li   s6, 0			#payload flag
 
+    li   t0, 0xFE
+    sw   t0, UART_TX_OFFSET(s2) # Send 0xFE to UART to indicate QIO read start
+    
 qio_read_start:
     jal  ra, drain_rx_fifo
 
@@ -379,13 +382,25 @@ firmware_done:
     li   t0, 0x04
     sw   t0, 0(t6)
 
+    li   t0, 0xFF
+    sw   t0, UART_TX_OFFSET(s2) # Send 0xFF to UART to indicate firmware load done
+
     li   t0, SRAM_BASE
     jr   t0
-######################################################## --- Cross check with the correct Firmware jump address in bram.
 
 done:
     j done
 
+.else
+################## --- UART_PATH: Bootrom tests complete, jump to firmware at SRAM_BASE ---
+    li   t0, 0xFF
+    sw   t0, UART_TX_OFFSET(s2) # Send 0xFF to UART to indicate bootrom done
+
+    # end of bootrom, firmware should start right after here
+.endif
+######################################################## --- Halt catchall
+
+.ifdef FLASH_PATH
 # --------------------------------------------------
 # Drain RX FIFO completely
 # --------------------------------------------------
@@ -397,3 +412,4 @@ drain_rx_fifo:
     j    drain_rx_fifo
 drain_rx_done:
     ret
+.endif
