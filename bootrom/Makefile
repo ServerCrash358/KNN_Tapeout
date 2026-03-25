@@ -18,6 +18,7 @@ LD_DEFINES := -DBOOTROM_START_ADDR=$(BOOTROM_START_ADDR) \
 
 # Build type (FLASH_PATH or UART_PATH)
 BUILD_MODE ?= FLASH_PATH
+OBJ_DIR    := $(BUILD_DIR)/obj/$(BUILD_MODE)
 CFLAGS += -D$(BUILD_MODE)
 
 # Output suffix based on build mode (for UART_PATH, creates separate bootrom)
@@ -30,8 +31,8 @@ C_SRCS   := $(wildcard $(SRC_DIR)/*.c)
 ASM_SRCS := $(wildcard $(SRC_DIR)/*.S)
 
 OBJS := \
-	$(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(C_SRCS)) \
-	$(patsubst $(SRC_DIR)/%.S,$(BUILD_DIR)/%.o,$(ASM_SRCS))
+	$(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(C_SRCS)) \
+	$(patsubst $(SRC_DIR)/%.S,$(OBJ_DIR)/%.o,$(ASM_SRCS))
 
 # Default target
 all: $(TARGET).elf $(TARGET).dis $(TARGET).bin $(TARGET).hex $(TARGET).coe $(TARGET).mem $(TARGET).v
@@ -57,10 +58,13 @@ clean-tests:
 $(BUILD_DIR):
 	mkdir -p $@
 
-$(BUILD_DIR)/%.o: $(SRC_DIR)/%.c ../config.mk | $(BUILD_DIR)
+$(OBJ_DIR): | $(BUILD_DIR)
+	mkdir -p $@
+
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c ../config.mk | $(OBJ_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(BUILD_DIR)/%.o: $(SRC_DIR)/%.S ../config.mk | $(BUILD_DIR)
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.S ../config.mk | $(OBJ_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 # Preprocess linker script

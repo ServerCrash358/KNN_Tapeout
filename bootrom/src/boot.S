@@ -50,7 +50,7 @@ main:
     li   t0, 0x0
     sw   t0, 4(t6)
 
-.ifdef FLASH_PATH
+#ifdef FLASH_PATH
     # --- SPI Init ---
     li   t0, 0x1E6
     sw   t0, 0x60(s1)
@@ -58,9 +58,9 @@ main:
     sw   t0, 0x60(s1)
     li   t0, 0x086
     sw   t0, 0x60(s1)
-.endif
+#endif
 
-####################### --- BRAM TEST ---
+#  --- BRAM TEST ---
     li   t0, 10
     sw   t0, 0(s0)
     li   t0, 20
@@ -82,12 +82,12 @@ delay2:
     addi t0, t0, -1
     bnez t0, delay2
 
-####################### --- GPIO STATUS: BRAM DONE (0x01) ---
+#  --- GPIO STATUS: BRAM DONE (0x01) ---
     li   t0, 0x01
     sw   t0, 0(t6)
 
-.ifdef FLASH_PATH
-####################### --- WREN ---
+#ifdef FLASH_PATH
+# --- WREN ---
     li   t0, -2
     sw   t0, SPI_SSR_OFFSET(s1)
 wren_tx_wait:
@@ -98,7 +98,7 @@ wren_tx_wait:
     li   t0, 0x06
     sw   t0, SPI_TX_FIFO_OFFSET(s1)
 
-#loop allows write to flash
+# loop allows write to flash
 wren_end_wait:
     lw   t0, SPI_SR_OFFSET(s1)
     andi t0, t0, TX_EMPTY_MASK
@@ -137,11 +137,11 @@ wrr_end_wait:
     li   t0, -1
     sw   t0, SPI_SSR_OFFSET(s1)
 
-###################### --- GPIO STATUS: SPI + QE DONE (0x03) ---
+# --- GPIO STATUS: SPI + QE DONE (0x03) ---
     li   t0, 0x03
     sw   t0, 0(t6)
 
-###################### --- WIP poll loop ---
+# --- WIP poll loop ---
 wip_poll_loop:
     li   t0, 0X0C6
     sw   t0, 0x60(s1)
@@ -186,11 +186,11 @@ uart_tx_full:
     sw   zero, UART_TX_OFFSET(s2)
     sw   zero, UART_TX_OFFSET(s2)
 
-##################### --- GPIO STATUS: UART DONE (0x02) ---
+# --- GPIO STATUS: UART DONE (0x02) ---
     li   t0, 0x02
     sw   t0, 0(t6)
 
-##################### --- QIO Read : FLASH -> BRAM ---
+# --- QIO Read : FLASH -> BRAM ---
     li   s3, 0x03
     sw   s3, 0xc(s2)
     li   s3, FW_FLASH_OFFSET   # flash read start address
@@ -264,7 +264,7 @@ qio_tx_dummy_wait4:
     sw   t0, SPI_SSR_OFFSET(s1) 						# Assert CS
 
 
-    #disable master inhibit
+    # disable master inhibit
     li   t0, 0x086
     sw   t0, 0x60(s1)
 
@@ -298,7 +298,7 @@ wait_tx_empty:
     addi s5,s5,4
     addi s4,s4,-1
 
-############################################# --- Read Burst Loop (for s4=4 words) ---
+#  --- Read Burst Loop (for s4=4 words) ---
 read_burst_loop:
     li   x7,4
     beq  s4, zero, read_burst_end # If count is 0, we're done
@@ -321,7 +321,7 @@ qio_rx_wait:
 
 # check for the data transmission between flash and controller
 # dummy
-################# --- 2. POLL FOR RX DATA ---
+#  --- 2. POLL FOR RX DATA ---
 
 qio_rx_wait_:
     lw   t0, SPI_SR_OFFSET(s1)
@@ -357,7 +357,7 @@ read_burst_end:
     jal  ra, drain_rx_fifo
 
     beqz s6, parse_header
-    j firmware_done
+    j verify_payload
 
 ######################################################## --- PARSE FIRMWARE HEADER (now in BRAM)
 parse_header:
@@ -367,17 +367,27 @@ parse_header:
 
     lw   t2, 4(s0)              # firmware size (bytes)
     lw   t3, 8(s0)              # load address
-    lw   t4, 12(s0)             # entry point
+    lw   s7, 12(s0)             # expected checksum
 
     srli t2, t2, 2              # bytes -> words
     mv   s4, t2                 # number of words to read
     mv   s5, t3                 # destination address in BRAM
+    mv   s8, t3                 # preserve payload base for checksum
+    mv   s9, t2                 # preserve payload word count for checksum
     addi s3, s3, FW_HEADER_BYTES # advance flash offset to payload
     li   s6, 1			#flag set to knn
     j    qio_read_start
 
+#  --- VERIFY PAYLOAD CHECKSUM
+verify_payload:
+    mv   a0, s8                 # payload base address
+    mv   a1, s9                 # payload size in words
+    jal  ra, fw_checksum32
+    bne  a0, s7, done
+    j    firmware_done
 
-######################################################## --- GPIO STATUS: FLASH BURST READ DONE (0x04) ---
+
+#  --- GPIO STATUS: FLASH BURST READ DONE (0x04) ---
 firmware_done:
     li   t0, 0x04
     sw   t0, 0(t6)
@@ -385,22 +395,21 @@ firmware_done:
     li   t0, 0xFF
     sw   t0, UART_TX_OFFSET(s2) # Send 0xFF to UART to indicate firmware load done
 
-    li   t0, SRAM_BASE
+    mv   t0, s8 # Jump to firmware start address (payload base)
     jr   t0
 
 done:
     j done
 
-.else
-################## --- UART_PATH: Bootrom tests complete, jump to firmware at SRAM_BASE ---
+#else
+# --- UART_PATH: Bootrom tests complete, jump to firmware at SRAM_BASE ---
     li   t0, 0xFF
     sw   t0, UART_TX_OFFSET(s2) # Send 0xFF to UART to indicate bootrom done
 
     # end of bootrom, firmware should start right after here
-.endif
-######################################################## --- Halt catchall
+#endif
 
-.ifdef FLASH_PATH
+#ifdef FLASH_PATH
 # --------------------------------------------------
 # Drain RX FIFO completely
 # --------------------------------------------------
@@ -412,4 +421,4 @@ drain_rx_fifo:
     j    drain_rx_fifo
 drain_rx_done:
     ret
-.endif
+#endif

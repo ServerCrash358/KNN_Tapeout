@@ -94,7 +94,6 @@ config:
 	@echo "Firmware Header:"
 	@echo "  FW_MAGIC           = $(FW_MAGIC)"
 	@echo "  FW_LOAD_ADDR       = $(FW_LOAD_ADDR)"
-	@echo "  FW_ENTRY_PC        = $(FW_ENTRY_PC)"
 	@echo ""
 	@echo "Toolchain:"
 	@echo "  RISCV_PREFIX       = $(RISCV_PREFIX)"

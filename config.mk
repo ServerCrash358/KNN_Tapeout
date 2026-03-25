@@ -19,7 +19,6 @@ RAM_SIZE           := 16384          # 16KB (0x4000 bytes)
 
 FW_MAGIC           := 0xB007B007
 FW_LOAD_ADDR       := $(RAM_START_ADDR)
-FW_ENTRY_PC        := $(RAM_START_ADDR)
 
 # =============================================================================
 # Toolchain Configuration
@@ -41,8 +40,3 @@ OPT_LEVEL          := -Os
 
 # Additional compiler flags
 EXTRA_CFLAGS       := -ffreestanding -nostdlib -Wall
-
-# Build mode: flash or uart
-# flash: bootrom burned into chip, firmware loaded from SPI flash
-# uart:  bootrom with tests + firmware combined, loaded via UART
-BUILD_MODE         ?= flash
