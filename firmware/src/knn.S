@@ -1,4 +1,5 @@
 #include "dsq.h"
+#include "irq.h"
 
 .text
 .globl main
@@ -286,22 +287,16 @@ store_result:
     li   x2, 0x05000000
     sw   x15, 0(x2)             # stores the index/ counter value of x30
 
-    # delay for 0.5 seconds, assuming 100MHz clock
-    li  x10, 100000000 / 2
-    # li   x10, 8
-    call delay    
+    # Program timer for ~0.5s and wait for timer IRQ0 to become pending.
+    li   x10, 100000000 / 2
+    picorv32_timer_insn(x0, x10)
+timer_wait_irq0:
+    picorv32_waitirq_insn(x31)
+    andi x31, x31, 1
+    beqz x31, timer_wait_irq0
 
     addi x6, x6, 1
     j    test_loop
-
-delay:
-    # take in a delay param in cycles
-    # addi ~3 cycles, branch(taken) ~5 cycles => 8 cycles per iteration
-    srli x31, x10, 3      # iterations = x10 >> 3
-delay_loop:
-    addi x31, x31, -1
-    bnez x31, delay_loop
-    ret
 
 end:    
     li   x5, 0x05000000  

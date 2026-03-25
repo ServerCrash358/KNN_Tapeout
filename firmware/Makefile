@@ -30,7 +30,9 @@ OBJS := \
 
 # Default target
 all: $(TARGET).elf $(TARGET).dis $(TARGET).bin $(TARGET).hex $(TARGET).coe $(TARGET).mem \
-     $(TARGET)_with_header.bin $(TARGET)_with_header.hex $(TARGET)_with_header.coe $(TARGET)_with_header.mem
+	$(TARGET).memh \
+	$(TARGET)_with_header.bin $(TARGET)_with_header.hex $(TARGET)_with_header.coe $(TARGET)_with_header.mem \
+	$(TARGET)_with_header.memh
 
 # Ensure build folder exists
 $(BUILD_DIR):
@@ -65,9 +67,12 @@ $(TARGET).elf: $(OBJS) $(BUILD_DIR)/firmware.lds
 %.mem: %.bin $(SCRIPT_DIR)/bin2mem.py
 	python3 $(SCRIPT_DIR)/bin2mem.py $< $@ $(RAM_START_ADDR)
 
+%.memh: %.bin $(SCRIPT_DIR)/bin2memh.py
+	python3 $(SCRIPT_DIR)/bin2memh.py $< $@ $(RAM_SIZE) 0xff 16
+
 # Firmware with header
 $(TARGET)_with_header.bin: $(TARGET).bin $(SCRIPT_DIR)/append_firmware_header.py
-	python3 $(SCRIPT_DIR)/append_firmware_header.py $< $@ $(FW_MAGIC) $(FW_LOAD_ADDR) $(FW_ENTRY_PC)
+	python3 $(SCRIPT_DIR)/append_firmware_header.py $< $@ $(FW_MAGIC) $(FW_LOAD_ADDR)
 
 $(TARGET)_with_header.hex: $(TARGET)_with_header.bin $(SCRIPT_DIR)/makehex.py
 	python3 $(SCRIPT_DIR)/makehex.py $< > $@

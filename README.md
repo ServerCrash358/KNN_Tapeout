@@ -45,16 +45,17 @@ Each build produces:
 | `.hex`    | Hex    | 32-bit hex words |
 | `.coe`    | COE    | Xilinx memory initialization |
 | `.mem`    | MEM    | Vivado flash initialization |
+| `.memh`   | MEMH   | Vivado-friendly byte-hex initialization |
 | `.v`      | Verilog| Register-based ROM (bootrom only) |
 
-Firmware additionally generates `*_with_header.{bin,hex,coe,mem}` with a 16-byte header:
+Firmware additionally generates `*_with_header.{bin,hex,coe,mem,memh}` with a 16-byte header:
 
 | Offset | Size | Field       | Description |
 |--------|------|-------------|-------------|
 | 0x00   | 4    | Magic       | 0xB007B007 |
 | 0x04   | 4    | Size        | Payload bytes |
 | 0x08   | 4    | Load Addr   | 0x00004000 |
-| 0x0C   | 4    | Entry PC    | 0x00004000 |
+| 0x0C   | 4    | Checksum    | 32-bit additive sum of payload words |
 
 ## Directory Structure
 
@@ -73,6 +74,7 @@ Firmware additionally generates `*_with_header.{bin,hex,coe,mem}` with a 16-byte
 │   ├── makehex.py               # Binary to hex
 │   ├── bin2coe.py               # Binary to COE
 │   ├── bin2mem.py               # Binary to MEM
+│   ├── bin2memh.py              # Binary to MEMH (byte-wise)
 │   ├── bin2verilog.py           # Binary to Verilog module
 │   └── append_firmware_header.py # Add firmware header
 ├── config.mk          # Central configuration
